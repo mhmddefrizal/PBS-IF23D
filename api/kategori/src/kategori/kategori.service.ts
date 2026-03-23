@@ -27,7 +27,7 @@ export class KategoriService {
     // cek apakah nama kategori sudah ada
     const exist = await this.prisma.kategori.findFirst({
       where: {
-        nama: nama_filter,
+        nama_filter: nama_filter,
       },
     });
 
@@ -48,6 +48,7 @@ export class KategoriService {
     await this.prisma.kategori.create({
       data: {
         nama: createKategoriDto.nama,
+        nama_filter: nama_filter,
       },
     });
 
