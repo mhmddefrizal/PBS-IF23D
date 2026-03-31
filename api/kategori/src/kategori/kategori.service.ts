@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   HttpException,
   HttpStatus,
@@ -27,7 +28,7 @@ export class KategoriService {
     // cek apakah nama kategori sudah ada
     const exist = await this.prisma.kategori.findFirst({
       where: {
-        nama: nama_filter,
+        nama_filter: nama_filter,
       },
     });
 
@@ -48,6 +49,7 @@ export class KategoriService {
     await this.prisma.kategori.create({
       data: {
         nama: createKategoriDto.nama,
+        nama_filter: nama_filter,
       },
     });
 
@@ -92,7 +94,7 @@ export class KategoriService {
     // jika data kategori ditemukan
     return {
       success: true,
-      message: 'Data kategori',
+      message: 'Data kategori berhasil ditemukan',
       metadata: {
         status: HttpStatus.OK,
         total_data: data.length,
@@ -101,8 +103,50 @@ export class KategoriService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} kategori`;
+  // buat fungsi untuk detail data
+  async findOne(id: number) {
+    // return `This action returns a #${id} kategori`;
+
+    // tampilkan data kategori berdasarkan id
+    try {
+      const data = await this.prisma.kategori.findUnique({
+        where: {
+          id: id,
+        },
+      });
+
+      // jika data tidak ditemukan
+      if (!data) {
+        throw new NotFoundException({
+          success: false,
+          message: 'Data kategori tidak ditemukan',
+          metadata: {
+            status: HttpStatus.NOT_FOUND,
+          },
+        });
+      }
+
+      // jika data ditemukan
+      return {
+        success: true,
+        message: 'Data kategori berhasil ditemukan',
+        metadata: {
+          status: HttpStatus.OK,
+        },
+        data,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException({
+        success: false,
+        message: 'Parameter / Slug ID harus berupa angka!',
+        metadata: {
+          status: HttpStatus.NOT_FOUND,
+        },
+      });
+    }
   }
 
   update(id: number, updateKategoriDto: UpdateKategoriDto) {
