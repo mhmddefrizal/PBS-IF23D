@@ -10,6 +10,8 @@ import { CreateKategoriDto } from './dto/create-kategori.dto';
 import { UpdateKategoriDto } from './dto/update-kategori.dto';
 import { PrismaService } from '../prisma.service';
 import { metadata } from 'reflect-metadata/no-conflict';
+import { notExistKategori } from '../common/utils/not-exist-kategori.util';
+import { conflictKategori } from '../common/utils/conflict-kategori.util';
 
 @Injectable()
 export class KategoriService {
@@ -19,29 +21,12 @@ export class KategoriService {
   async create(createKategoriDto: CreateKategoriDto) {
     // return 'This action adds a new kategori';
 
-    // buat variabel untuk filter nama
-    const nama_filter = createKategoriDto.nama
-      .replace(/\s/g, '')
-      .toLowerCase()
-      .trim();
-
-    // cek apakah nama kategori sudah ada
-    const exist = await this.prisma.kategori.findFirst({
-      where: {
-        nama_filter: nama_filter,
-      },
-    });
-
-    // jika nama kategori sudah ada
-    if (exist) {
-      throw new ConflictException({
-        success: false,
-        message: 'Data kategori Gagal disimpan!, nama kategori sudah ada.',
-        metadata: {
-          status: HttpStatus.CONFLICT,
-        },
-      });
-    }
+    // panggil fungsi conflictKategori
+    const nama_filter = await conflictKategori(
+      this.prisma.kategori,
+      process.env.FAILED_SAVE!,
+      createKategoriDto.nama,
+    );
 
     // jika nama kategori belum ada
 
@@ -55,7 +40,7 @@ export class KategoriService {
 
     return {
       success: true,
-      message: 'Data kategori berhasil disimpan',
+      message: process.env.SUCCESS_SAVE,
       metadata: {
         status: HttpStatus.CREATED,
       },
@@ -107,24 +92,13 @@ export class KategoriService {
   async findOne(id: number) {
     // return `This action returns a #${id} kategori`;
 
-    // tampilkan data kategori berdasarkan id
     try {
-      const data = await this.prisma.kategori.findUnique({
-        where: {
-          id: id,
-        },
-      });
-
-      // jika data tidak ditemukan
-      if (!data) {
-        throw new NotFoundException({
-          success: false,
-          message: 'Data kategori tidak ditemukan',
-          metadata: {
-            status: HttpStatus.NOT_FOUND,
-          },
-        });
-      }
+      // panggil fungsi notExistKategori
+      const data = await notExistKategori(
+        this.prisma.kategori,
+        id,
+        'Data kategori tidak ditemukan bro!',
+      );
 
       // jika data ditemukan
       return {
@@ -133,7 +107,7 @@ export class KategoriService {
         metadata: {
           status: HttpStatus.OK,
         },
-        data,
+        data: data,
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -143,17 +117,118 @@ export class KategoriService {
         success: false,
         message: 'Parameter / Slug ID harus berupa angka!',
         metadata: {
-          status: HttpStatus.NOT_FOUND,
+          status: HttpStatus.BAD_REQUEST,
         },
       });
     }
   }
 
-  update(id: number, updateKategoriDto: UpdateKategoriDto) {
-    return `This action updates a #${id} kategori`;
+  // buat fungsi untuk ubah data kategori
+  async update(id: number, updateKategoriDto: UpdateKategoriDto) {
+    // return `This action updates a #${id} kategori`;
+
+    try {
+      // panggil fungsi notExistKategori
+      await notExistKategori(
+        this.prisma.kategori,
+        id,
+        'Data kategori tidak ditemukan bro!',
+      );
+
+      // jika data ditemukan
+
+      // panggil fungsi conflictKategori
+      const nama_filter = await conflictKategori(
+        this.prisma.kategori,
+        process.env.FAILED_UPDATE!,
+        updateKategoriDto.nama ?? '',
+        id,
+      );
+
+      // jika nama kategori belum ada
+      // ubah data kategori berdasarkan id
+      await this.prisma.kategori.update({
+        where: {
+          id: id,
+        },
+        data: {
+          nama: updateKategoriDto.nama,
+          nama_filter: nama_filter,
+        },
+      });
+      return {
+        success: true,
+        message: process.env.SUCCESS_UPDATE,
+        metadata: {
+          status: HttpStatus.OK,
+        },
+      };
+    } catch (error) {
+      // if (error instanceof NotFoundException) {
+      //   throw error;
+      // }
+
+      // if (
+      //   error instanceof NotFoundException ||
+      //   error instanceof ConflictException
+      // ) {
+      //   throw error;
+      // }
+
+      // if (error instanceof ConflictException) {
+      //   throw error;
+      // }
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new BadRequestException({
+        success: false,
+        message: 'Parameter / Slug ID harus berupa angka!',
+        metadata: {
+          status: HttpStatus.BAD_REQUEST,
+        },
+      });
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} kategori`;
+  async remove(id: number) {
+    // return `This action removes a #${id} kategori`;
+    try {
+      // panggil fungsi notExistKategori
+      await notExistKategori(
+        this.prisma.kategori,
+        id,
+        'Data kategori tidak ditemukan bro!',
+      );
+
+      // jika data ditemukan
+      // hapus data kategori berdasarkan id
+      await this.prisma.kategori.delete({
+        where: {
+          id: id,
+        },
+      });
+
+      return {
+        success: true,
+        message: 'Data kategori berhasil dihapus',
+        metadata: {
+          status: HttpStatus.OK,
+        },
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException({
+        success: false,
+        message: 'Parameter / Slug ID harus berupa angka!',
+        metadata: {
+          status: HttpStatus.BAD_REQUEST,
+        },
+      });
+    }
   }
 }
