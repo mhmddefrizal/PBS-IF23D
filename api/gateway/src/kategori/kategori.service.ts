@@ -14,15 +14,20 @@ export interface Kategori {
 export class KategoriService {
   // buat variabel untuk endpoint kategori
   private readonly base_url = 'http://localhost:3001/api/kategori';
-  create(createKategoriDto: CreateKategoriDto) {
-    return 'This action adds a new kategori';
+
+  // fungsi untuk akses
+  // endpoint kategori (create)
+  async create(createKategoriDto: CreateKategoriDto): Promise<Kategori> {
+    // return 'This action adds a new kategori';
+    const response = await kategori_api.post<Kategori>('/', createKategoriDto);
+    return response.data;
   }
 
   // fungsi untuk akses
   // endpoint kategori (findAll)
   async findAll(): Promise<Kategori[]> {
     // return `This action returns all kategori`;
-    const response = await axios.get<Kategori[]>(`${this.base_url}`);
+    const response = await kategori_api.get<Kategori[]>('/');
     return response.data;
   }
 
@@ -35,11 +40,21 @@ export class KategoriService {
     return response.data;
   }
 
-  update(id: number, updateKategoriDto: UpdateKategoriDto) {
-    return `This action updates a #${id} kategori`;
+  async update(
+    id: number,
+    updateKategoriDto: UpdateKategoriDto,
+  ): Promise<Kategori> {
+    // return `This action updates a #${id} kategori`;
+    const response = await kategori_api.patch<Kategori>(
+      `/${id}`,
+      updateKategoriDto,
+    );
+    return response.data;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} kategori`;
+  async remove(id: number): Promise<Kategori> {
+    // return `This action removes a #${id} kategori`;
+    const response = await kategori_api.delete<Kategori>(`/${id}`);
+    return response.data;
   }
 }

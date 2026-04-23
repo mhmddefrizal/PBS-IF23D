@@ -10,8 +10,8 @@ export const kategori_api = axios.create({
 // buat interceptor untuk response
 kategori_api.interceptors.response.use(
   (response) => response,
-  (error: AxiosError<{ message?: string }>) => {
-    const message = error.response?.data?.message;
+  (error: AxiosError) => {
+    const message = error.response?.data;
     const status = error.response?.status;
 
     if (status && message) {
