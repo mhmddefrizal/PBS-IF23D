@@ -9,9 +9,7 @@ export const notExistKategori = async (
 ) => {
   // tampilkan data kategori berdasarkan id
   const data = await prisma.findUnique({
-    where: {
-      id: id,
-    },
+    where: { id: id },
   });
 
   // jika data tidak ditemukan
@@ -27,3 +25,7 @@ export const notExistKategori = async (
 
   return data;
 };
+
+// export async function notExistKategori() {
+
+// }

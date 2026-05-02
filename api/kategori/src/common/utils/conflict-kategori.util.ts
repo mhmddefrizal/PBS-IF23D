@@ -1,16 +1,16 @@
-// buat fungsi untuk cek data kategori
-// duplikasi data kategori
+// buat fungsi untuk cek
 
-import { ConflictException } from '@nestjs/common/exceptions/conflict.exception';
+import { ConflictException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
-import { HttpStatus } from '@nestjs/common/enums';
 
+// duplikasi data kategori
 export const conflictKategori = async (
   prisma: PrismaService['kategori'],
   message: string,
   nama: string,
   id?: number,
 ) => {
+  // buat variabel untuk filter nama
   const nama_filter = nama.replace(/\s/g, '').toLowerCase().trim();
 
   // cek apakah nama kategori sudah ada

@@ -14,6 +14,7 @@ kategori_api.interceptors.response.use(
     const message = error.response?.data;
     const status = error.response?.status;
 
+    // jika terbaca status error
     if (status && message) {
       throw new HttpException(message, status);
     }

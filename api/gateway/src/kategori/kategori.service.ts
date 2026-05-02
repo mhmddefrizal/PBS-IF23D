@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { kategori_api } from '../common/instances/kategori.instance';
 import { CreateKategoriDto } from './dto/create-kategori.dto';
 import { UpdateKategoriDto } from './dto/update-kategori.dto';
-import axios from 'axios';
-import { kategori_api } from '../common/instances/kategori.instance';
 
 // buat interface untuk data kategori
 export interface Kategori {
@@ -12,8 +11,8 @@ export interface Kategori {
 }
 @Injectable()
 export class KategoriService {
-  // buat variabel untuk endpoint kategori
   private readonly base_url = 'http://localhost:3001/api/kategori';
+  // buat variabel untuk endpoint kategori
 
   // fungsi untuk akses
   // endpoint kategori (create)
@@ -31,7 +30,8 @@ export class KategoriService {
     return response.data;
   }
 
-  // fungsi untuk akses endpoint kategori (findOne)
+  // fungsi untuk akses
+  // endpoint kategori (findOne)
   async findOne(id: number): Promise<Kategori> {
     // return `This action returns a #${id} kategori`;
     // const response = await axios.get<Kategori>(`${this.base_url}/${id}`);
