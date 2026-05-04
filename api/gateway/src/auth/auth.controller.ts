@@ -8,6 +8,7 @@ export class AuthController {
 
   @Post('login')
   login(@Body() dto: AuthDto) {
+    // panggil fungsi login dari auth service
     return this.authService.login(dto);
   }
 }

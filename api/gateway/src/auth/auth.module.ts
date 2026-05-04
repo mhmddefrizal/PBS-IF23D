@@ -6,8 +6,11 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 
 @Module({
+  // import passport dan jwt (untuk buat token)
   imports: [
-    PassportModule.register({ defaultStrategy: 'jwt' }),
+    // cek kesesuaian dengan jwt.guard
+    PassportModule.register({}),
+    // cek kesesuaian dengan jwt.strategy
     JwtModule.register({
       secret: 'IF23D',
       signOptions: { expiresIn: '1m' },

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy, type StrategyOptions } from 'passport-jwt';
 
+// buat interface
 interface JwtPayload {
   username: string;
   password: string;
@@ -18,6 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super(options);
   }
 
+  // fungsi untuk validasi jwt
   validate(payload: JwtPayload) {
     return {
       username: payload.username,
