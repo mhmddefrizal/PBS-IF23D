@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import * as passportJwt from 'passport-jwt';
-
-const { ExtractJwt, Strategy } = passportJwt;
+import { ExtractJwt, Strategy, type StrategyOptions } from 'passport-jwt';
 
 interface JwtPayload {
   username: string;
@@ -12,10 +10,12 @@ interface JwtPayload {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
-    super({
+    const options: StrategyOptions = {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: 'IF23D',
-    });
+    };
+
+    super(options);
   }
 
   validate(payload: JwtPayload) {
