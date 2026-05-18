@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy, type StrategyOptions } from 'passport-jwt';
+import * as passportJwt from 'passport-jwt';
+
+const { ExtractJwt, Strategy } = passportJwt;
 
 // buat interface
 interface JwtPayload {
@@ -9,14 +11,15 @@ interface JwtPayload {
 }
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtAccessStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-access',
+) {
   constructor() {
-    const options: StrategyOptions = {
+    super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'IF23D',
-    };
-
-    super(options);
+      secretOrKey: 'Access-IF23D',
+    });
   }
 
   // fungsi untuk validasi jwt

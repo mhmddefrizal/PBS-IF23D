@@ -11,7 +11,7 @@ import {
 import { KategoriService } from './kategori.service';
 import { CreateKategoriDto } from './dto/create-kategori.dto';
 import { UpdateKategoriDto } from './dto/update-kategori.dto';
-import { JwtGuard } from '../auth/jwt.guard';
+import { JwtGuard } from '../auth/guards/jwt-access.guard';
 
 @Controller('kategori')
 @UseGuards(JwtGuard)
